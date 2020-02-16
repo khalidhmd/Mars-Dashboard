@@ -21,7 +21,6 @@ const render = async (root, state) => {
     roverSelect.addEventListener("change", async e => {
       updateStore(store, { loading: true });
       const roverData = await getRoverData(e.target.value);
-      console.log(roverData);
       updateStore(store, {
         selected: e.target.value,
         roverData,

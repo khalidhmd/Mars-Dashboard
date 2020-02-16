@@ -6,13 +6,6 @@ body {
   font-family: Arial;
 }
 
-header {
-  /* header styles */
-}
-
-footer {
-  /* footer styles */
-}
 .gallery-header {
   text-align: center;
 }
@@ -55,17 +48,4 @@ footer {
     width: 45%;
     margin: 10px;
   }
-  /* use mobile */
-}
-
-/* -------------------  DESKTOP  -------------------- */
-
-@media (min-width: 1224px) {
-  /* use mobile */
-}
-
-/* -------------------  LARGE SCREENS  -------------- */
-
-@media (min-width: 1824px) {
-  /* use mobile */
 }
