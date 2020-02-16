@@ -87,6 +87,7 @@ const RoverData = (roverData, selected) => {
                   <p>Name: ${selected}</p>
                   <p>Launch date: ${roverData.launch_date}</p>
                   <p>Landing Date: ${roverData.landing_date}</p>
+                  <p>Photos Date: ${roverData.max_date}</p>
                   <p>Status: ${roverData.status}</p>
               </section>
               
