@@ -4,7 +4,6 @@ body {
   display: flex;
   flex-direction: column;
   font-family: Arial;
-  min-height: 100vh;
 }
 
 header {
@@ -14,9 +13,48 @@ header {
 footer {
   /* footer styles */
 }
-
+.gallery-header {
+  text-align: center;
+}
+.container {
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.gallery {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+.img {
+  width: 90%;
+  margin: 10px;
+}
 /* -------------------  TABLET  --------------------- */
 @media (min-width: 768px) {
+  .gallery-header {
+    text-align: center;
+  }
+  .container {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+  }
+  .img {
+    display: inline-block;
+    width: 45%;
+    margin: 10px;
+  }
   /* use mobile */
 }
 

@@ -1,7 +1,8 @@
 let store = {
   rovers: ["Curiosity", "Opportunity", "Spirit"],
   selected: "0",
-  roverData: {}
+  roverData: {},
+  loading: false
 };
 
 // add our markup to the page
@@ -16,33 +17,36 @@ const updateStore = (store, newState) => {
 const render = async (root, state) => {
   root.innerHTML = App(state);
   roverSelect = document.getElementById("rover");
-  roverSelect.addEventListener("change", e => {
-    updateStore(store, { selected: e.target.value });
-  });
+  if (roverSelect) {
+    roverSelect.addEventListener("change", async e => {
+      updateStore(store, { loading: true });
+      const roverData = await getRoverData(e.target.value);
+      console.log(roverData);
+      updateStore(store, {
+        selected: e.target.value,
+        roverData,
+        loading: false
+      });
+    });
+  }
 };
 
 // create content
 const App = state => {
-  let { rovers, selected, roverData } = state;
+  let { rovers, selected, roverData, loading } = state;
 
   return `
+        ${
+          loading
+            ? `<h1>Loading...</h1>`
+            : `
         <div class="container">
         <header class="header"> 
           ${RoverSelector(rovers, selected)}
         </header>
-        ${
-          selected == "0"
-            ? ``
-            : `
-              <section class="info">
-                  <h1>Rover info</h1>
-                  <p>Name: ${selected}</p>
-                  <p>Launch date: 11/11/11</p>
-                  <p>Landing Date: 11/11/11</p>
-                  <p>Status: rover status</p>
-              </section>
-              <sections class="gallery"></sections>
-              `
+        ${RoverData(roverData, selected)}
+        ${RoverPhotos(roverData, selected)}
+        `
         }
         
     </div>
@@ -57,6 +61,8 @@ window.addEventListener("load", async () => {
 // ------------------------------------------------------  COMPONENTS
 
 // Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
+
+//rover selector component
 const RoverSelector = (rovers, selected) => {
   return `
             <select name="rover" id="rover">
@@ -72,42 +78,44 @@ const RoverSelector = (rovers, selected) => {
             </select>`;
 };
 
-// Example of a pure function that renders infomation requested from the backend
-const ImageOfTheDay = apod => {
-  // If image does not already exist, or it is not from today -- request it again
-  const today = new Date();
-  const photodate = new Date(apod.date);
-  console.log(photodate.getDate(), today.getDate());
+// rover data display component
+const RoverData = (roverData, selected) => {
+  return selected == "0"
+    ? ``
+    : `
+              <section class="info">
+                  <h1>Rover info</h1>
+                  <p>Name: ${selected}</p>
+                  <p>Launch date: ${roverData.launch_date}</p>
+                  <p>Landing Date: ${roverData.landing_date}</p>
+                  <p>Status: ${roverData.status}</p>
+              </section>
+              
+              `;
+};
 
-  console.log(photodate.getDate() === today.getDate());
-  if (!apod || apod.date === today.getDate()) {
-    getImageOfTheDay(store);
-  }
-
-  // check if the photo of the day is actually type video!
-  if (apod.media_type === "video") {
-    return `
-            <p>See today's featured video <a href="${apod.url}">here</a></p>
-            <p>${apod.title}</p>
-            <p>${apod.explanation}</p>
-        `;
-  } else {
-    return `
-            <img src="${apod.image.url}" height="350px" width="100%" />
-            <p>${apod.image.explanation}</p>
-        `;
-  }
+// rover photos display component
+const RoverPhotos = (roverData, selected) => {
+  return selected == "0"
+    ? ``
+    : `
+      <h1 class="gallery-header">${selected} most recent photos</h1>
+      <section class="gallery">
+        ${roverData.photos
+          .map(
+            photo => `<img class="img" src="${photo}" alt="${photo}" ></img>`
+          )
+          .reduce((prev, photo) => prev + photo)}
+        
+      </section>
+      `;
 };
 
 // ------------------------------------------------------  API CALLS
-
-// Example API call
-const getImageOfTheDay = state => {
-  let { apod } = state;
-
-  fetch(`http://localhost:3000/apod`)
-    .then(res => res.json())
-    .then(apod => updateStore(store, { apod }));
-
+// Get Rover data from back-end
+// The returned data object will contain rover data as well as most recent photos
+const getRoverData = async rover => {
+  const res = await fetch(`http://localhost:3000/rover?rover=${rover}`);
+  const data = await res.json();
   return data;
 };
