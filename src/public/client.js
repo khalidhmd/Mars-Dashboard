@@ -20,7 +20,8 @@ const render = async (root, state) => {
   if (roverSelect) {
     roverSelect.addEventListener("change", async e => {
       updateStore(store, { loading: true });
-      const roverData = await getRoverData(e.target.value);
+      const roverDataAsync = getRoverData(e.target.value);
+      const roverData = await roverDataAsync();
       updateStore(store, {
         selected: e.target.value,
         roverData,
@@ -35,20 +36,21 @@ const App = state => {
   let { rovers, selected, roverData, loading } = state;
 
   return `
-        ${
-          loading
-            ? `<h1>Loading...</h1>`
-            : `
-        <div class="container">
-          <header class="header"> 
-            ${RoverSelector(rovers, selected)}
-          </header>
-          ${RoverData(roverData, selected)}
-          ${RoverPhotos(roverData, selected)}
-          `
-        }
-        </div>
-    `;
+          ${
+            loading
+              ? `<h1>Loading...</h1>`
+              : `
+                <div class="container">
+                <header class="header"> 
+                  ${RoverSelector(rovers, selected)}
+                </header>
+                ${RoverData(roverData, selected)}
+                ${RoverPhotos(generatePhotos, roverData, selected)}
+                </div>
+                `
+          }
+        
+        `;
 };
 
 // listening for load event because page should load before any JS is called
@@ -93,28 +95,37 @@ const RoverData = (roverData, selected) => {
               `;
 };
 
+// Higher Order Function That takes afunction as argument
 // rover photos display component
-const RoverPhotos = (roverData, selected) => {
+const RoverPhotos = (callback, roverData, selected) => {
   return selected == "0"
     ? ``
     : `
       <h1 class="gallery-header">${selected} most recent photos</h1>
       <section class="gallery">
-        ${roverData.photos
-          .map(
-            photo => `<img class="img" src="${photo}" alt="${photo}" ></img>`
-          )
-          .reduce((prev, photo) => prev + photo)}
+        ${callback(roverData)}
         
       </section>
       `;
 };
 
+function generatePhotos(roverData) {
+  return roverData.photos
+    .map(photo => `<img class="img" src="${photo}" alt="${photo}" ></img>`)
+    .reduce((prev, photo) => prev + photo);
+}
+
 // ------------------------------------------------------  API CALLS
 // Get Rover data from back-end
 // The returned data object will contain rover data as well as most recent photos
-const getRoverData = async rover => {
-  const res = await fetch(`http://localhost:3000/rover?rover=${rover}`);
-  const data = await res.json();
-  return data;
+
+//Higher order function that returns a function
+const getRoverData = rover => {
+  const roverDataAsync = async () => {
+    const res = await fetch(`http://localhost:3000/rover?rover=${rover}`);
+    const data = await res.json();
+    return data;
+  };
+
+  return roverDataAsync;
 };

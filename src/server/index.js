@@ -14,7 +14,7 @@ app.use("/", express.static(path.join(__dirname, "../public")));
 
 // your API calls
 
-app.get("/favicon.ico", () => res.send("ok"));
+app.get("/favicon.ico", (req, res) => res.send("ok"));
 
 app.get("/rover", async (req, res) => {
   try {
