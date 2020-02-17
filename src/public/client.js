@@ -1,21 +1,21 @@
-let store = {
+let store = Immutable.Map({
   rovers: ["Curiosity", "Opportunity", "Spirit"],
   selected: "0",
   roverData: {},
   loading: false
-};
+});
 
 // add our markup to the page
 const root = document.getElementById("root");
 let roverSelect;
 
-const updateStore = (store, newState) => {
-  store = Object.assign(store, newState);
+const updateStore = (state, newState) => {
+  store = state.merge(newState);
   render(root, store);
 };
 
 const render = async (root, state) => {
-  root.innerHTML = App(state);
+  root.innerHTML = App(state.toJS());
   roverSelect = document.getElementById("rover");
   if (roverSelect) {
     roverSelect.addEventListener("change", async e => {
@@ -40,15 +40,14 @@ const App = state => {
             ? `<h1>Loading...</h1>`
             : `
         <div class="container">
-        <header class="header"> 
-          ${RoverSelector(rovers, selected)}
-        </header>
-        ${RoverData(roverData, selected)}
-        ${RoverPhotos(roverData, selected)}
-        `
+          <header class="header"> 
+            ${RoverSelector(rovers, selected)}
+          </header>
+          ${RoverData(roverData, selected)}
+          ${RoverPhotos(roverData, selected)}
+          `
         }
-        
-    </div>
+        </div>
     `;
 };
 
